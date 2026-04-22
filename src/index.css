@@ -1,0 +1,149 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Gumtree & Co — Australian cafe design system
+   Warm cream, burnt terracotta, deep espresso, eucalyptus sage.
+   All colors HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 38 40% 96%;          /* warm cream */
+    --foreground: 24 25% 14%;          /* deep espresso */
+
+    --card: 38 40% 96%;
+    --card-foreground: 24 25% 14%;
+
+    --popover: 38 40% 96%;
+    --popover-foreground: 24 25% 14%;
+
+    --primary: 18 45% 32%;             /* roasted terracotta */
+    --primary-foreground: 38 50% 96%;
+
+    --secondary: 35 30% 88%;           /* sand */
+    --secondary-foreground: 24 25% 14%;
+
+    --muted: 35 25% 90%;
+    --muted-foreground: 24 15% 38%;
+
+    --accent: 96 18% 45%;              /* eucalyptus sage */
+    --accent-foreground: 38 50% 96%;
+
+    --destructive: 0 70% 45%;
+    --destructive-foreground: 38 50% 96%;
+
+    --border: 30 20% 82%;
+    --input: 30 20% 82%;
+    --ring: 18 45% 32%;
+
+    --radius: 0.25rem;
+
+    /* Brand tokens */
+    --espresso: 24 30% 12%;
+    --cream: 38 50% 96%;
+    --clay: 18 55% 48%;
+    --terracotta: 14 45% 38%;
+    --sage: 96 18% 45%;
+    --sand: 35 30% 88%;
+    --gold: 36 60% 55%;
+
+    /* Gradients */
+    --gradient-warm: linear-gradient(135deg, hsl(38 50% 96%) 0%, hsl(35 35% 88%) 100%);
+    --gradient-sunset: linear-gradient(180deg, hsl(28 50% 78%) 0%, hsl(14 45% 48%) 100%);
+    --gradient-dark: linear-gradient(180deg, hsl(24 30% 12%) 0%, hsl(18 35% 18%) 100%);
+
+    /* Shadows */
+    --shadow-soft: 0 20px 60px -20px hsl(24 30% 12% / 0.25);
+    --shadow-warm: 0 30px 80px -30px hsl(18 45% 32% / 0.35);
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 24 30% 10%;
+    --foreground: 38 40% 94%;
+    --card: 24 30% 12%;
+    --card-foreground: 38 40% 94%;
+    --popover: 24 30% 12%;
+    --popover-foreground: 38 40% 94%;
+    --primary: 28 60% 70%;
+    --primary-foreground: 24 30% 10%;
+    --secondary: 24 20% 20%;
+    --secondary-foreground: 38 40% 94%;
+    --muted: 24 20% 18%;
+    --muted-foreground: 35 15% 65%;
+    --accent: 96 18% 55%;
+    --accent-foreground: 24 30% 10%;
+    --destructive: 0 62.8% 40%;
+    --destructive-foreground: 38 40% 94%;
+    --border: 24 20% 22%;
+    --input: 24 20% 22%;
+    --ring: 28 60% 70%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', sans-serif;
+    font-feature-settings: "ss01", "cv11";
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Fraunces', serif;
+    font-optical-sizing: auto;
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: 'Fraunces', serif;
+  }
+
+  .font-body {
+    font-family: 'Inter', sans-serif;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .grain {
+    position: relative;
+  }
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.06;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .marquee-track {
+    animation: marquee 40s linear infinite;
+  }
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+}
