@@ -9,13 +9,85 @@ import menuPastry from "@/assets/menu-pastry.jpg";
 import storyBeans from "@/assets/story-beans.jpg";
 import leafImg from "@/assets/leaf.png";
 import featuredRoast from "@/assets/featured-roast.png";
+import v60Img from "@/assets/v60_brewing.png";
+import aeropressImg from "@/assets/aeropress_brewing.png";
+import espressoImg from "@/assets/espresso_extraction.png";
+import lightBeans from "@/assets/light_beans.png";
+import mediumBeans from "@/assets/medium_beans.png";
+import darkBeans from "@/assets/dark_beans.png";
+
+import { X, Timer, Bean, Droplets, Flame, Camera } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
+
+const RECIPES = [
+  {
+    id: "v60",
+    title: "The Perfect V60",
+    method: "Hario V60",
+    ratio: "1:16",
+    time: "3:00",
+    temp: "94°C",
+    grind: "Medium-Fine",
+    color: "#D2691E",
+    image: v60Img,
+    steps: [
+      "Rinse filter and preheat your V60 and server.",
+      "Add 15g of freshly ground coffee (medium-fine).",
+      "Bloom: Pour 30g of water, stir slightly, wait 30s.",
+      "First Pour: Slowly add water up to 150g in circles.",
+      "Final Pour: Add remaining water up to 240g.",
+      "Gently tap the V60 to settle the bed. Let it drain."
+    ]
+  },
+  {
+    id: "aeropress",
+    title: "Aeropress Inverted",
+    method: "Aeropress",
+    ratio: "1:14",
+    time: "1:30",
+    temp: "85°C",
+    grind: "Medium",
+    color: "#8B4513",
+    image: aeropressImg,
+    steps: [
+      "Set Aeropress in inverted position (plunger on top).",
+      "Add 17g of coffee. Add 240g of water at 85°C.",
+      "Stir 10 times gently to ensure all grounds are wet.",
+      "Steep for 60 seconds. Place filter cap and rinse.",
+      "Carefully flip onto your mug.",
+      "Press slowly over 30 seconds until you hear the hiss."
+    ]
+  },
+  {
+    id: "espresso",
+    title: "The Golden Shot",
+    method: "Espresso Machine",
+    ratio: "1:2",
+    time: "0:28",
+    temp: "93°C",
+    grind: "Fine",
+    color: "#3D2B1F",
+    image: espressoImg,
+    steps: [
+      "Dose 18g into a clean, dry portafilter basket.",
+      "Distribute evenly and tamp with consistent pressure.",
+      "Purge the group head before locking in.",
+      "Start the shot immediately. Aim for 36g out.",
+      "Extraction should take between 25-30 seconds.",
+      "Stir to incorporate the crema before drinking."
+    ]
+  }
+];
 
 const Index = () => {
   const root = useRef<HTMLDivElement>(null);
   const cursorRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const modalContentRef = useRef<HTMLDivElement>(null);
   const [time, setTime] = useState("");
+  const [activeRecipe, setActiveRecipe] = useState<typeof RECIPES[0] | null>(null);
+  const [roastLevel, setRoastLevel] = useState(2); // 1: Light, 2: Medium, 3: Dark
 
   // Sydney clock
   useEffect(() => {
@@ -42,9 +114,34 @@ const Index = () => {
     const move = (e: MouseEvent) => {
       xTo(e.clientX);
       yTo(e.clientY);
+      
+      // Parallax for floating elements
+      gsap.to(".float-bean", {
+        x: (e.clientX - window.innerWidth / 2) * 0.05,
+        y: (e.clientY - window.innerHeight / 2) * 0.05,
+        duration: 1,
+        ease: "power2.out"
+      });
+      gsap.to(".float-leaf", {
+        x: (e.clientX - window.innerWidth / 2) * -0.03,
+        y: (e.clientY - window.innerHeight / 2) * -0.03,
+        duration: 1,
+        ease: "power2.out"
+      });
     };
-    const enter = () => gsap.to(cursor, { scale: 2.4, opacity: 1, duration: 0.3 });
-    const leave = () => gsap.to(cursor, { scale: 1, opacity: 0.5, duration: 0.3 });
+    const enter = (e: any) => {
+      const type = e.target.closest("[data-cursor]")?.getAttribute("data-cursor");
+      gsap.to(cursor, { scale: 2.4, opacity: 1, duration: 0.3 });
+      if (type === "brew") {
+        cursor.innerHTML = '<span class="text-[8px] uppercase font-bold text-white">Brew</span>';
+      } else if (type === "view") {
+        cursor.innerHTML = '<span class="text-[8px] uppercase font-bold text-white">View</span>';
+      }
+    };
+    const leave = () => {
+      gsap.to(cursor, { scale: 1, opacity: 0.5, duration: 0.3 });
+      cursor.innerHTML = "";
+    };
     window.addEventListener("mousemove", move);
     document.querySelectorAll("[data-cursor]").forEach((el) => {
       el.addEventListener("mouseenter", enter);
@@ -283,6 +380,25 @@ const Index = () => {
         scrollTrigger: { trigger: ".brew-section", start: "top 75%" },
       });
 
+      // ===== Tilt effects for cards =====
+      document.querySelectorAll<HTMLElement>(".tilt-card").forEach((el) => {
+        const move = (e: MouseEvent) => {
+          const r = el.getBoundingClientRect();
+          const x = (e.clientX - r.left) / r.width - 0.5;
+          const y = (e.clientY - r.top) / r.height - 0.5;
+          gsap.to(el, {
+            rotateY: x * 10,
+            rotateX: -y * 10,
+            scale: 1.02,
+            duration: 0.5,
+            ease: "power3.out"
+          });
+        };
+        const reset = () => gsap.to(el, { rotateY: 0, rotateX: 0, scale: 1, duration: 0.6, ease: "power3.out" });
+        el.addEventListener("mousemove", move);
+        el.addEventListener("mouseleave", reset);
+      });
+
       // ===== Magnetic hover on .magnet =====
       document.querySelectorAll<HTMLElement>(".magnet").forEach((el) => {
         const move = (e: MouseEvent) => {
@@ -300,12 +416,57 @@ const Index = () => {
     return () => ctx.revert();
   }, []);
 
+  // Modal Animation
+  useEffect(() => {
+    if (activeRecipe) {
+      document.body.style.overflow = "hidden";
+      const tl = gsap.timeline();
+      tl.to(modalRef.current, { display: "flex", opacity: 1, duration: 0.4, ease: "power2.out" })
+        .fromTo(modalContentRef.current, 
+          { y: 50, opacity: 0, scale: 0.95 },
+          { y: 0, opacity: 1, scale: 1, duration: 0.6, ease: "expo.out" },
+          "-=0.2"
+        )
+        .from(".recipe-step", {
+          x: -20,
+          opacity: 0,
+          stagger: 0.1,
+          duration: 0.5,
+          ease: "power3.out"
+        }, "-=0.3")
+        .from(".recipe-stat", {
+          y: 20,
+          opacity: 0,
+          stagger: 0.05,
+          duration: 0.4,
+          ease: "power3.out"
+        }, "-=0.5");
+    } else if (modalRef.current) {
+      document.body.style.overflow = "auto";
+      gsap.to(modalRef.current, { opacity: 0, duration: 0.3, ease: "power2.in", onComplete: () => {
+        if (modalRef.current) modalRef.current.style.display = "none";
+      }});
+    }
+  }, [activeRecipe]);
+
+  const ROAST_DATA = [
+    { name: "Light Roast", desc: "Bright, acidic, floral notes. Preserves the bean's origin character.", icon: <Droplets className="w-6 h-6" /> },
+    { name: "Medium Roast", desc: "Balanced body, caramel sweetness. The classic Byron morning vibe.", icon: <Bean className="w-6 h-6" /> },
+    { name: "Dark Roast", desc: "Full body, low acidity, smoky cacao notes. Bold and intense.", icon: <Flame className="w-6 h-6" /> }
+  ];
+
   return (
-    <div ref={root} className="min-h-screen bg-background text-foreground overflow-x-hidden">
+    <>
+      <div 
+        ref={root} 
+        className={`min-h-screen transition-colors duration-1000 overflow-x-hidden ${
+          roastLevel === 1 ? "bg-orange-50/50" : roastLevel === 2 ? "bg-background" : "bg-stone-900"
+        } ${roastLevel === 3 ? "text-cream" : "text-foreground"}`}
+      >
       {/* Custom cursor */}
       <div
         ref={cursorRef}
-        className="pointer-events-none fixed top-0 left-0 z-[100] w-3 h-3 -ml-1.5 -mt-1.5 rounded-full bg-clay mix-blend-difference opacity-50 hidden md:block"
+        className="pointer-events-none fixed top-0 left-0 z-[300] w-3 h-3 -ml-1.5 -mt-1.5 rounded-full bg-clay mix-blend-difference opacity-50 hidden md:flex items-center justify-center text-center overflow-hidden"
       />
 
       {/* NAV */}
@@ -461,13 +622,13 @@ const Index = () => {
               { img: menuBrunch, tag: "All Day", title: "Smashed Avo", title2: "+ Poached Egg", desc: "Sourdough, lemon, chilli flakes, microherbs.", price: "22" },
               { img: menuPastry, tag: "Bakery", title: "Banana Bread", desc: "Stone-milled flour, browned butter, sea salt.", price: "8" },
             ].map((m, i) => (
-              <article key={i} data-cursor className="menu-card group cursor-pointer">
+              <article key={i} data-cursor="view" className="menu-card tilt-card group cursor-pointer">
                 <div className="aspect-[4/5] overflow-hidden mb-6 relative">
                   <img
                     src={m.img}
                     alt={m.title}
                     loading="lazy"
-                    className="w-full h-full object-cover transition-transform duration-[1400ms] ease-out group-hover:scale-110"
+                    className="w-full h-full object-cover transition-transform duration-1000 ease-out group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-espresso/0 group-hover:bg-espresso/20 transition-colors duration-500" />
                 </div>
@@ -556,10 +717,22 @@ const Index = () => {
             <div className="gallery-img col-span-6 md:col-span-5 aspect-[4/5] overflow-hidden">
               <img src={menuCoffee} alt="Flat white with latte art" loading="lazy" className="w-full h-[120%] object-cover" />
             </div>
+            
+            {/* New Brewing Images */}
+            <div className="gallery-img col-span-6 md:col-span-4 aspect-square overflow-hidden">
+              <img src={v60Img} alt="V60 Pour Over" loading="lazy" className="w-full h-[120%] object-cover" />
+            </div>
+            <div className="gallery-img col-span-6 md:col-span-4 aspect-square overflow-hidden">
+              <img src={aeropressImg} alt="Aeropress Brewing" loading="lazy" className="w-full h-[120%] object-cover" />
+            </div>
+            <div className="gallery-img col-span-12 md:col-span-4 aspect-square overflow-hidden">
+              <img src={espressoImg} alt="Espresso Extraction" loading="lazy" className="w-full h-[120%] object-cover" />
+            </div>
+
             <div className="gallery-img col-span-6 md:col-span-5 aspect-[4/5] overflow-hidden">
               <img src={menuPastry} alt="Fresh croissants and banana bread" loading="lazy" className="w-full h-[120%] object-cover" />
             </div>
-            <div className="gallery-img col-span-12 md:col-span-7 aspect-[16/10] overflow-hidden">
+            <div className="gallery-img col-span-6 md:col-span-7 aspect-[16/10] overflow-hidden">
               <img src={menuBrunch} alt="Smashed avo on sourdough" loading="lazy" className="w-full h-[120%] object-cover" />
             </div>
           </div>
@@ -651,7 +824,12 @@ const Index = () => {
               { tag: "Aeropress", t: "Inverted", ratio: "1 : 14", time: "1:30", note: "Steep for 60s, swirl, press gently for 30s. Drink it hot, drink it slow." },
               { tag: "Espresso", t: "Double Shot", ratio: "1 : 2", time: "0:28", note: "18g in, 36g out. Pull until the stream goes from honey to silk." },
             ].map((b, i) => (
-              <article key={i} data-cursor className="brew-tab magnet group p-8 border border-espresso/10 bg-cream hover:bg-espresso hover:text-cream transition-colors duration-700 cursor-pointer">
+              <article 
+                key={i} 
+                data-cursor="brew" 
+                onClick={() => setActiveRecipe(RECIPES[i])}
+                className="brew-tab tilt-card magnet group p-8 border border-espresso/10 bg-cream hover:bg-espresso hover:text-cream transition-colors duration-700 cursor-pointer"
+              >
                 <div className="flex justify-between items-start mb-12">
                   <span className="text-[10px] uppercase tracking-[0.3em] text-clay">{b.tag}</span>
                   <span className="font-display text-xl">0{i + 1}</span>
@@ -714,6 +892,75 @@ const Index = () => {
         </div>
       </section>
 
+      {/* ROAST SELECTOR */}
+      <section className="bg-espresso text-cream py-24 md:py-40 px-6 md:px-12 grain overflow-hidden">
+        <div className="max-w-[1400px] mx-auto">
+          <div className="grid md:grid-cols-2 gap-16 items-center">
+            <div>
+              <p className="reveal text-xs uppercase tracking-[0.35em] text-clay mb-6">Interactive Roastery</p>
+              <h2 className="reveal-words font-display font-light text-5xl md:text-7xl leading-[1.02] mb-10 text-balance">
+                Find your <span className="italic text-clay">vibe.</span>
+              </h2>
+              <div className="space-y-8">
+                <div className="flex justify-between items-center bg-cream/5 p-8 rounded-lg border border-cream/10">
+                  <div className="flex gap-4">
+                    {ROAST_DATA[roastLevel - 1].icon}
+                    <div>
+                      <h4 className="font-display text-2xl">{ROAST_DATA[roastLevel - 1].name}</h4>
+                      <p className="text-cream/60 text-sm mt-1">{ROAST_DATA[roastLevel - 1].desc}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="flex justify-between text-[10px] uppercase tracking-[0.2em] text-clay font-bold">
+                    <span>Light</span>
+                    <span>Medium</span>
+                    <span>Dark</span>
+                  </div>
+                  <input 
+                    type="range" 
+                    min="1" 
+                    max="3" 
+                    step="1" 
+                    value={roastLevel} 
+                    onChange={(e) => setRoastLevel(parseInt(e.target.value))}
+                    className="w-full h-1.5 bg-cream/20 rounded-lg appearance-none cursor-pointer accent-clay"
+                  />
+                </div>
+
+                <button 
+                  onClick={() => setActiveRecipe(RECIPES[roastLevel - 1])}
+                  className="w-full py-4 border border-clay text-clay hover:bg-clay hover:text-cream transition-all duration-500 uppercase tracking-[0.2em] text-xs font-bold flex items-center justify-center gap-3"
+                >
+                  View {ROAST_DATA[roastLevel - 1].name} Recipe
+                  <span className="text-lg">→</span>
+                </button>
+              </div>
+            </div>
+            
+            <div className="relative aspect-square flex items-center justify-center">
+              <div className={`absolute inset-0 rounded-full blur-[120px] transition-colors duration-1000 ${
+                roastLevel === 1 ? "bg-orange-300/20" : roastLevel === 2 ? "bg-clay/30" : "bg-brown-900/40"
+              }`} />
+              
+              <div className="relative z-10 text-center space-y-6">
+                <div className="w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden border-4 border-clay/30 shadow-2xl transition-transform duration-1000 hover:scale-105">
+                  <img 
+                    src={roastLevel === 1 ? lightBeans : roastLevel === 2 ? mediumBeans : darkBeans} 
+                    alt="Coffee beans" 
+                    className="w-full h-full object-cover transition-opacity duration-700"
+                  />
+                </div>
+                <p className="font-display text-3xl italic text-clay">
+                  {roastLevel === 1 ? "Fruit Forward" : roastLevel === 2 ? "Perfectly Balanced" : "Deep & Bold"}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* FOOTER */}
       <footer className="bg-espresso text-cream/70 pt-20 pb-12 px-6 md:px-12 overflow-hidden">
         <div className="max-w-[1400px] mx-auto">
@@ -749,6 +996,94 @@ const Index = () => {
         }
       `}</style>
     </div>
+
+      {/* RECIPE MODAL */}
+      <div 
+        ref={modalRef}
+        className="fixed inset-0 z-[200] hidden items-center justify-center p-4 md:p-12 bg-espresso/95 backdrop-blur-xl"
+        onClick={() => setActiveRecipe(null)}
+      >
+        <div 
+          ref={modalContentRef}
+          className="relative w-full max-w-5xl bg-cream text-espresso overflow-hidden shadow-2xl rounded-sm"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button 
+            onClick={() => setActiveRecipe(null)}
+            className="absolute top-6 right-6 p-2 hover:bg-espresso/5 rounded-full transition-colors z-20"
+          >
+            <X className="w-6 h-6" />
+          </button>
+
+          <div className="grid md:grid-cols-2">
+            <div className="p-8 md:p-16 border-b md:border-b-0 md:border-r border-espresso/10">
+              <p className="text-xs uppercase tracking-[0.3em] text-clay mb-4">Brew Guide</p>
+              <h2 className="font-display text-5xl md:text-7xl font-light mb-8 leading-[1.1]">
+                {activeRecipe?.title}
+              </h2>
+              
+              <div className="grid grid-cols-2 gap-8 mb-12">
+                <div className="recipe-stat">
+                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Ratio</p>
+                  <p className="font-display text-2xl">{activeRecipe?.ratio}</p>
+                </div>
+                <div className="recipe-stat">
+                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Time</p>
+                  <div className="flex items-center gap-2 font-display text-2xl">
+                    <Timer className="w-5 h-5 text-clay" />
+                    {activeRecipe?.time}
+                  </div>
+                </div>
+                <div className="recipe-stat">
+                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Temp</p>
+                  <p className="font-display text-2xl">{activeRecipe?.temp}</p>
+                </div>
+                <div className="recipe-stat">
+                  <p className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">Grind</p>
+                  <p className="font-display text-2xl">{activeRecipe?.grind}</p>
+                </div>
+              </div>
+
+              <div className="p-6 bg-espresso text-cream rounded-sm flex items-center justify-between group cursor-pointer hover:bg-clay transition-colors duration-500">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full border border-cream/20 flex items-center justify-center">
+                    <Timer className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase tracking-widest opacity-60">Barista Assist</p>
+                    <p className="font-display text-lg">Start Brew Timer</p>
+                  </div>
+                </div>
+                <span className="text-xl">→</span>
+              </div>
+            </div>
+
+            <div className="p-8 md:p-16 bg-sand/30">
+              <h3 className="font-display text-2xl mb-8 border-b border-espresso/10 pb-4">Method</h3>
+              <div className="space-y-6">
+                {activeRecipe?.steps.map((step, i) => (
+                  <div key={i} className="recipe-step flex gap-6">
+                    <span className="font-display text-xl text-clay opacity-40 shrink-0">0{i + 1}</span>
+                    <p className="text-sm leading-relaxed text-espresso/80">{step}</p>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="mt-12 pt-8 border-t border-espresso/10 flex items-center justify-between">
+                <div className="flex -space-x-2">
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="w-8 h-8 rounded-full border-2 border-cream bg-espresso/10" />
+                  ))}
+                </div>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                  128 people brewed this today
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 };
 
