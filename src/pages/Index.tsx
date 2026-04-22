@@ -7,9 +7,8 @@ import menuBrunch from "@/assets/menu-brunch.jpg";
 import menuCoffee from "@/assets/menu-coffee.jpg";
 import menuPastry from "@/assets/menu-pastry.jpg";
 import storyBeans from "@/assets/story-beans.jpg";
-import beanImg from "@/assets/bean.png";
 import leafImg from "@/assets/leaf.png";
-import coffeePourAsset from "@/assets/coffee-pour.mp4.asset.json";
+import featuredRoast from "@/assets/featured-roast.png";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -253,6 +252,14 @@ const Index = () => {
         ease: "linear",
       });
 
+      // ===== Featured Roast Reveal =====
+      gsap.from(".roast-img", {
+        scale: 1.1,
+        duration: 1.8,
+        ease: "power3.out",
+        scrollTrigger: { trigger: ".roast-section", start: "top 80%" },
+      });
+
       // ===== Video section reveal with mask =====
       gsap.from(".video-frame", {
         clipPath: "inset(20% 20% 20% 20%)",
@@ -333,15 +340,15 @@ const Index = () => {
         <img src={leafImg} alt="" aria-hidden className="float-leaf absolute top-24 right-8 md:right-24 w-24 md:w-40 opacity-70 pointer-events-none" />
 
         <div className="hero-content relative z-10 h-full flex flex-col pt-32 pb-20 md:pb-32 px-6 md:px-12 max-w-[1600px] mx-auto">
-          <p className="hero-eyebrow mt-auto text-xs uppercase tracking-[0.35em] mb-6 text-cream/80">
+          <p className="hero-eyebrow mt-auto text-xs uppercase tracking-[0.35em] mb-4 text-cream/80">
             Est. 2018 — Byron Bay, NSW
           </p>
-          <h1 className="font-display font-light text-[15vw] sm:text-[12vw] md:text-[7.5vw] leading-[0.95] tracking-tighter">
-            <span className="block overflow-hidden"><span className="hero-line block">Slow</span></span>
-            <span className="block overflow-hidden"><span className="hero-line block italic font-normal text-clay">mornings,</span></span>
-            <span className="block overflow-hidden"><span className="hero-line block">strong coffee.</span></span>
+          <h1 className="font-display font-light text-[13vw] sm:text-[10vw] md:text-[6.5vw] leading-[1.1] tracking-tighter">
+            <span className="block overflow-hidden"><span className="hero-line block py-1">Slow</span></span>
+            <span className="block overflow-hidden -mt-2 md:-mt-4"><span className="hero-line block italic font-normal text-clay py-1">mornings,</span></span>
+            <span className="block overflow-hidden -mt-2 md:-mt-4"><span className="hero-line block py-1">strong coffee.</span></span>
           </h1>
-          <div className="mt-10 flex flex-col md:flex-row md:items-end justify-between gap-8">
+          <div className="mt-8 flex flex-col md:flex-row md:items-end justify-between gap-8">
             <p className="hero-sub max-w-md text-base md:text-lg text-cream/85 font-light leading-relaxed">
               A sun-soaked corner of the Northern Rivers serving single-origin espresso, sourdough toasties and very little hurry.
             </p>
@@ -590,49 +597,41 @@ const Index = () => {
         </div>
       </section>
 
-      {/* VIDEO SHOWCASE */}
-      <section className="video-section relative bg-espresso text-cream py-24 md:py-40 px-6 md:px-12 overflow-hidden grain">
-        <div className="video-bg-text absolute top-1/2 -translate-y-1/2 left-0 whitespace-nowrap font-display italic font-light text-[20vw] leading-none text-cream/[0.04] select-none pointer-events-none">
-          Slow Pour · Slow Pour · Slow Pour ·
-        </div>
-        <div className="relative max-w-[1400px] mx-auto grid md:grid-cols-12 gap-12 items-center">
-          <div className="md:col-span-5">
-            <p className="reveal text-xs uppercase tracking-[0.35em] text-clay mb-6">In motion</p>
-            <h2 className="reveal-words font-display font-light text-5xl md:text-6xl leading-[1.05] mb-8 text-balance">
-              The pour, the pause, the first sip.
-            </h2>
-            <p className="reveal text-cream/70 leading-relaxed mb-8 max-w-md">
-              We pull every shot at 9 bars, 93°C, 28 seconds. The crema settles like sunset on Wategos Beach.
-            </p>
-            <div className="reveal grid grid-cols-3 gap-4 max-w-sm pt-6 border-t border-cream/10">
-              <div>
-                <p className="font-display text-3xl text-clay">9<span className="text-base text-cream/50">bar</span></p>
-                <p className="text-[10px] uppercase tracking-widest text-cream/50 mt-1">Pressure</p>
-              </div>
-              <div>
-                <p className="font-display text-3xl text-clay">93<span className="text-base text-cream/50">°C</span></p>
-                <p className="text-[10px] uppercase tracking-widest text-cream/50 mt-1">Temp</p>
-              </div>
-              <div>
-                <p className="font-display text-3xl text-clay">28<span className="text-base text-cream/50">s</span></p>
-                <p className="text-[10px] uppercase tracking-widest text-cream/50 mt-1">Extract</p>
-              </div>
-            </div>
-          </div>
-          <div className="md:col-span-7">
-            <div className="video-frame relative aspect-video overflow-hidden shadow-warm">
-              <video
-                src={coffeePourAsset.url}
-                autoPlay
-                muted
-                loop
-                playsInline
-                className="w-full h-full object-cover"
+      {/* FEATURED ROAST */}
+      <section className="roast-section bg-espresso text-cream py-24 md:py-40 px-6 md:px-12 grain overflow-hidden">
+        <div className="max-w-[1400px] mx-auto grid md:grid-cols-2 gap-16 items-center">
+          <div className="order-2 md:order-1 relative">
+            <div className="aspect-[4/5] overflow-hidden rounded-sm shadow-2xl">
+              <img 
+                src={featuredRoast} 
+                alt="Signature Byron Blend Coffee Beans" 
+                className="roast-img w-full h-full object-cover"
               />
-              <div className="absolute bottom-4 left-4 text-[10px] uppercase tracking-[0.3em] text-cream/80 bg-espresso/40 backdrop-blur-sm px-3 py-1.5">
-                ◉ Live from the bar
+            </div>
+            <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-clay/20 backdrop-blur-3xl -z-10 rounded-full" />
+          </div>
+          <div className="order-1 md:order-2">
+            <p className="reveal text-xs uppercase tracking-[0.35em] text-clay mb-6">Small Batch Roastery</p>
+            <h2 className="reveal-words font-display font-light text-5xl md:text-7xl leading-[1.02] mb-8 text-balance">
+              The Byron Blend. <span className="italic text-clay">Roasted at dawn.</span>
+            </h2>
+            <p className="reveal text-lg text-cream/70 leading-relaxed mb-10 max-w-md">
+              Our signature seasonal blend, developed for the slow mornings of the Northern Rivers. Smooth enough for a flat white, bold enough for a long black.
+            </p>
+            <div className="reveal grid grid-cols-2 gap-8 mb-12 border-y border-cream/10 py-8">
+              <div>
+                <p className="text-[10px] uppercase tracking-widest text-clay mb-2">Tasting Notes</p>
+                <p className="font-display text-2xl">Caramel & Macadamia</p>
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-widest text-clay mb-2">Origin</p>
+                <p className="font-display text-2xl">PNG & Australia</p>
               </div>
             </div>
+            <a href="#" data-cursor className="magnet inline-flex items-center gap-4 bg-cream text-espresso px-8 py-4 text-sm uppercase tracking-[0.25em] hover:bg-clay hover:text-cream transition-colors duration-500">
+              Buy the bag
+              <span className="text-xl">→</span>
+            </a>
           </div>
         </div>
       </section>
