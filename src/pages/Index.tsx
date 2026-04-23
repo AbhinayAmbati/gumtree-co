@@ -16,7 +16,7 @@ import lightBeans from "@/assets/light_beans.png";
 import mediumBeans from "@/assets/medium_beans.png";
 import darkBeans from "@/assets/dark_beans.png";
 
-import { X, Timer, Bean, Droplets, Flame, Camera } from "lucide-react";
+import { X, Timer, Bean, Droplets, Flame, Camera, ChevronLeft, ChevronRight } from "lucide-react";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -88,6 +88,7 @@ const Index = () => {
   const [time, setTime] = useState("");
   const [activeRecipe, setActiveRecipe] = useState<typeof RECIPES[0] | null>(null);
   const [roastLevel, setRoastLevel] = useState(2); // 1: Light, 2: Medium, 3: Dark
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
   // Sydney clock
   useEffect(() => {
@@ -104,6 +105,22 @@ const Index = () => {
     const id = setInterval(update, 1000 * 30);
     return () => clearInterval(id);
   }, []);
+
+  // Auto-cycle roast levels
+  useEffect(() => {
+    if (!isAutoPlaying) return;
+    const interval = setInterval(() => {
+      setRoastLevel((prev) => (prev % 3) + 1);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [isAutoPlaying]);
+
+  const handleManualRoast = (next: number) => {
+    setIsAutoPlaying(false);
+    setRoastLevel(next);
+    // Resume autoplay after 15s of inactivity
+    setTimeout(() => setIsAutoPlaying(true), 15000);
+  };
 
   // Custom cursor follower
   useEffect(() => {
@@ -912,21 +929,34 @@ const Index = () => {
                   </div>
                 </div>
                 
-                <div className="space-y-4">
-                  <div className="flex justify-between text-[10px] uppercase tracking-[0.2em] text-clay font-bold">
-                    <span>Light</span>
-                    <span>Medium</span>
-                    <span>Dark</span>
+                <div className="flex items-center justify-between gap-4 pt-4">
+                  <button 
+                    onClick={() => handleManualRoast(roastLevel === 1 ? 3 : roastLevel - 1)}
+                    className="w-12 h-12 rounded-full border border-clay/30 flex items-center justify-center hover:bg-clay hover:text-cream transition-all duration-300"
+                    aria-label="Previous roast"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  
+                  <div className="flex gap-3">
+                    {[1, 2, 3].map(lvl => (
+                      <button
+                        key={lvl}
+                        onClick={() => handleManualRoast(lvl)}
+                        className={`w-2 h-2 rounded-full transition-all duration-500 ${
+                          roastLevel === lvl ? "w-8 bg-clay" : "bg-clay/20"
+                        }`}
+                      />
+                    ))}
                   </div>
-                  <input 
-                    type="range" 
-                    min="1" 
-                    max="3" 
-                    step="1" 
-                    value={roastLevel} 
-                    onChange={(e) => setRoastLevel(parseInt(e.target.value))}
-                    className="w-full h-1.5 bg-cream/20 rounded-lg appearance-none cursor-pointer accent-clay"
-                  />
+
+                  <button 
+                    onClick={() => handleManualRoast(roastLevel === 3 ? 1 : roastLevel + 1)}
+                    className="w-12 h-12 rounded-full border border-clay/30 flex items-center justify-center hover:bg-clay hover:text-cream transition-all duration-300"
+                    aria-label="Next roast"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
                 </div>
 
                 <button 
